@@ -1,6 +1,6 @@
 LIWC-Replication via Java
 
-This is the source code of a replication of LIWC in Java. This work is part of a Bachelor Thesis at Karlsruhe Institute 
+This is the source code of a replication of LIWC 2007 in Java. This work is part of a Bachelor Thesis at Karlsruhe Institute 
 of Technology (KIT), the theoretic foundation and technical explanation for different solutions can be reviewed in depth
 in the thesis ... .
 Included are severeal hirarchical processing classes for automated text analysis. 
