@@ -5,7 +5,7 @@ of Technology (KIT), the theoretic foundation and technical explanation for diff
 Included are severeal hirarchical processing classes for automated text analysis. 
 Multi-thread handling as well as automated input processing are covered within this implementation, too. Several input paramters can be passed to a construction class via commandline arguments to specify behavior. This implementation features a close replication of LIWC for the languages English and German, as well as an improved algorithmic analysis version.
 
-Following, detailed information about input configuration and actual handling of the program is given. The compiled java program can also be downloaded at dropbox (see bottom). Due to copyright, the actual dictionaries of LIWC can not be  distributed and you will need to acquire those separately.
+Detailed information about input configuration and actual handling of the program is given in the manual. The LIWC Replication manual can either be found in the subdirectory at github, or within the archive linked at the bottom of the page. The compiled java program can also be downloaded at dropbox (see bottom). Due to copyright, the actual dictionaries of LIWC can not be  distributed and you will need to acquire those separately.
 
 ------
 
