@@ -82,17 +82,17 @@ public class LIWCOutputBuilder implements LIWCListener {
             StringBuffer title = new StringBuffer();
             
             if (!written) {
-                title.append("Entity\t");
+                title.append("Entity");
             }
             
-            sb.append(ID + "\t");
+            sb.append(ID);
 
             while (!results.isEmpty()) {
                 c = results.pollFirst();
                 if (!written) {
-                    title.append(c.getName()).append("\t");
+                    title.append("\t").append(c.getName());
                 }
-                sb.append(c.getOccurences()).append("\t");
+                sb.append("\t").append(c.getOccurences());
             }
             
             PrintWriter out = new PrintWriter(new FileWriter(file,true));

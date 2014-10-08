@@ -1,20 +1,23 @@
 package socialobservatory.textanalysis.liwc.constructor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
 
 import socialobservatory.textanalysis.liwc.LIWCOutputBuilder;
 import socialobservatory.textanalysis.liwc.LIWCDictionary;
-import socialobservatory.textanalysis.liwc.LIWCListener;
 import socialobservatory.textanalysis.liwc.analysers.LIWCExpressionAnalyserManager;
 import socialobservatory.util.CharsetDetector;
 import socialobservatory.util.FileIO;
@@ -122,7 +125,7 @@ public class LIWCConstructor {
 		numOfThreads = cores*coreMultiplier;
 	}
 	
-	public void analyseFiles(){
+	public void analyseFiles() throws FileNotFoundException, IOException{
 		DataLoader dataLoader = new DataLoader();
 		dataLoader.setPriority(Thread.MAX_PRIORITY);
 		dataLoader.start();
@@ -173,6 +176,11 @@ public class LIWCConstructor {
 		}
 		
 		dataLoader.terminate();
+		if(eachLineSeparate){
+			System.out.println("aggregating results");
+			utilities.printLog("aggregating results");
+			aggregateResults(new File(resultPath, "results.txt"));
+		}
 	}
 	
 	public ArrayList<String> listFiles(String path, ArrayList<String> fileList){
@@ -292,13 +300,63 @@ public class LIWCConstructor {
     	return lang;
     }
 	
-	public Thread executeWithExpressionAnalysers(String ID, int num, String source, LIWCListener listener) {
-        LIWCExpressionAnalyserManager man = new LIWCExpressionAnalyserManager(ID, source, liwcdictionary, num, listener);
-        
-        Thread manThread = new Thread(man);
-        return manThread;
-        
-    }
+	public void aggregateResults(File f) throws FileNotFoundException, IOException{
+		String results = FileIO.readFileLines(f);
+		String[] resultLines = results.split("\n");
+		if(resultLines.length >= 2){
+			
+			String[] firstLine = resultLines[0].split("\t");
+			ArrayList<String[]> allLines = new ArrayList<String[]>();
+			ArrayList<String> IDs = new ArrayList<String>();
+			
+			//add lines
+			for(int z = 1; z < resultLines.length; z++){
+				allLines.add(resultLines[z].split("\t"));
+			}
+			
+			//get unique IDs
+			for(int j = 0; j < allLines.size(); j++){
+				if(!IDs.contains(allLines.get(j)[0])){
+					IDs.add(allLines.get(j)[0]);
+				}
+			}
+
+			f.delete();
+			PrintWriter out = new PrintWriter(new FileWriter(f,true));
+			out.println(resultLines[0]);
+			
+			//aggregate for all IDs
+			for(int s = 0; s < IDs.size(); s++){
+				double[] cats = new double[firstLine.length-1];
+				int count = 0;
+				for(String[] sa : allLines){
+					if(sa[0].equals(IDs.get(s))){
+						count++;
+						//first entry is entity identifier
+						for(int k = 0; k < cats.length; k++){
+							cats[k] = cats[k] + Double.parseDouble(sa[k+1]);
+						}
+					}
+				}
+				
+				//average (not word count)
+				for(int r = 1; r < cats.length; r++){
+					cats[r] = Math.round(100*cats[r]/count)/100d;
+				}
+
+				//write to file
+				out.print(IDs.get(s));
+				for(int l=0; l < cats.length; l++){
+					out.print("\t" + cats[l]);
+				}
+				if(s < IDs.size()-1){
+					out.print("\n");
+				}
+			}
+			
+			out.close();
+		}
+	}
 	
 	//internal Data Load Thread to improve performance on small text files
 	public class DataLoader extends Thread{
