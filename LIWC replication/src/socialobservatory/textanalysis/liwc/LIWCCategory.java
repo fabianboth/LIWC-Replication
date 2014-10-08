@@ -56,6 +56,10 @@ public class LIWCCategory implements Comparable<LIWCCategory> {
     public double getOccurences() {
         return occurences;
     }
+    
+    public void setOccurences(int occ) {
+        occurences = occ;
+    }
 
     public void normalise(int wordCount) {
         if (!normalised && occurences != 0) {

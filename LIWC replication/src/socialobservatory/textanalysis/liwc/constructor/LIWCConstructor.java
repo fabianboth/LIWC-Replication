@@ -135,6 +135,7 @@ public class LIWCConstructor {
 			String ID = split[split.length-1];
 			
 	        ArrayList<String> list = dataLoader.loadManager(path);
+	        boolean first = true;
 	        for(String s : list){
 
 				man = new LIWCExpressionAnalyserManager(ID, s, liwcdictionary, numOfThreads, results);
@@ -150,10 +151,14 @@ public class LIWCConstructor {
 		            utilities.printLog(e.toString());
 				}
 		        manThread = new Thread(man);
+
+				if(first){
+					System.out.println("analysing File: " + path);	
+					utilities.printLog("analysing File: " + path);	
+				}
 				manThread.start();
+				first = false;
 	        }
-			System.out.println("analysing File: " + path);		
-			utilities.printLog("analysing File: " + path);
 			
 		}
 		//wait for last thread

@@ -80,6 +80,9 @@ public abstract class LIWCAnalyserManager implements LIWCListener, Runnable {
                 while (iterator.hasNext()) {
                     iterator.next().normalise(wordCount);
                 }
+            	LIWCCategory wc = new LIWCCategory("WC", -1);
+            	wc.setOccurences(wordCount);
+            	results.add(wc);
                 synchronized (listener) {
                     listener.receiveAnalysisResults(this.ID, results);
                     listener.notifyAll();
