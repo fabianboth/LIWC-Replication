@@ -30,7 +30,7 @@ public class utilities {
     	s = s.replaceAll("\\uFEFF", "");
     	if(language.equals("en")){
     		if(improved){
-    			s = s.replaceAll("https?://\\S+\\s?", " ");
+    			s = removeLink(s);
     			s = s.replaceAll("’","'");
     			s = s.replaceAll("[^a-z0-9']", " ");
     			s = s.replaceAll("(?<=(\\s|^))'+(?=(\\s|$))", "");
@@ -48,7 +48,7 @@ public class utilities {
     		
     	}else if(language.equals("de")){
     		if(improved){
-    			s = s.replaceAll("https?://\\S+\\s?", " ");
+    			s = removeLink(s);
     			s = s.replaceAll("’","'");
     			s = s.replaceAll("[^a-z0-9öäüß']", " ");
     			s = s.replaceAll("(?<=(\\s|^))'+(?=(\\s|$))", "");
@@ -82,6 +82,12 @@ public class utilities {
     	s = s.replaceAll("ä", "ae");
     	s = s.replaceAll("ü", "ue");
     	return s;
+    }
+    
+    private static String removeLink(String s){
+    	s = s.replaceAll("https?://\\S+\\s?", " ");
+    	s = s.replaceAll("www.//\\S+\\s?", " ");
+    	return(s);
     }
     
     public static void setUmlautFlag(boolean b){
