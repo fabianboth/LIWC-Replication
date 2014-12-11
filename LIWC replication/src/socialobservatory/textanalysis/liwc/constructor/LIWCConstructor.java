@@ -37,6 +37,8 @@ public class LIWCConstructor {
     private String language = "en";
     private boolean umlautFlag = true;
     private boolean eachLineSeparate = false;
+    private boolean aggregate = true;
+    private boolean message = true;
     private boolean improvedMode = false;
     private int numOfThreads = 0;
     private final int coreMultiplier = 3;
@@ -120,6 +122,18 @@ public class LIWCConstructor {
 		}
 		utilities.setUmlautFlag(umlautFlag);
 		
+		//define if results in Linemode should be aggregated or not
+		if(args.length > 6 && args[6].equalsIgnoreCase("off")){
+			aggregate = false;
+		}else{
+			aggregate = true;
+		}
+		if(args.length > 7 && args[7].equalsIgnoreCase("off")){
+			message = false;
+		}else{
+			message = true;
+		}
+		
 		//determine number of threads
 		int cores = Runtime.getRuntime().availableProcessors();
 		numOfThreads = cores*coreMultiplier;
@@ -140,7 +154,9 @@ public class LIWCConstructor {
 	        ArrayList<String> list = dataLoader.loadManager(path);
 	        boolean first = true;
 	        for(String s : list){
-
+	        	//get dictionary
+				chooseDictionary(s);
+				
 				man = new LIWCExpressionAnalyserManager(ID, s, liwcdictionary, numOfThreads, results);
 		        man.setupManager();
 	        	
@@ -176,10 +192,15 @@ public class LIWCConstructor {
 		}
 		
 		dataLoader.terminate();
-		if(eachLineSeparate){
+		if(eachLineSeparate && aggregate){
 			System.out.println("aggregating results");
 			utilities.printLog("aggregating results");
 			aggregateResults(new File(resultPath, "results.txt"));
+		}
+		
+		//generate Popup-Window
+		if(message) {
+			new PopupWindow();
 		}
 	}
 	
@@ -388,8 +409,6 @@ public class LIWCConstructor {
 							source = utilities.replicateFalseUmlauts(source);
 						}
 							
-						//get dictionary
-						chooseDictionary(source);
 						String[] lines = source.split("\n");
 
 						//check if string is empty
@@ -406,7 +425,6 @@ public class LIWCConstructor {
 						if(!improvedMode && charset.name().equals("UTF-8")){
 							source = utilities.replicateFalseUmlauts(source);
 						}
-						chooseDictionary(source);
 						list.add(source);
 					}
 
