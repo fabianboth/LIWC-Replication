@@ -57,6 +57,8 @@ public class LIWCConstructor {
     //args[3] contains replication mode (optional)
     //args[4] contains line mode (optional)
     //args[5] contains umlaut mode (optional)
+    //args[6] define if results in Linemode should be aggregated or not
+	//args[7] control popup message
 	public static void main(String[] args) {
 		File log = new File("./logfile.txt");
 		log.delete();
@@ -128,6 +130,7 @@ public class LIWCConstructor {
 		}else{
 			aggregate = true;
 		}
+		//control popup message
 		if(args.length > 7 && args[7].equalsIgnoreCase("off")){
 			message = false;
 		}else{
@@ -307,7 +310,7 @@ public class LIWCConstructor {
 	}
 	
 	public String detectLanguage(String text){
-    	String lang = "";
+    	String lang = "en";
     	try {
 			Detector dec = DetectorFactory.create();
 			dec.setMaxTextLength(100);
@@ -322,7 +325,7 @@ public class LIWCConstructor {
     }
 	
 	public void aggregateResults(File f) throws FileNotFoundException, IOException{
-		String results = FileIO.readFileLines(f);
+		String results = FileIO.readFileAll(f);
 		String[] resultLines = results.split("\n");
 		if(resultLines.length >= 2){
 			
@@ -403,13 +406,15 @@ public class LIWCConstructor {
 					Charset charset = CharsetDetector.detectCharset(file);
 					
 					if(eachLineSeparate){
-						source = FileIO.readFileLines(file,charset);
+						source = FileIO.readFileAll(file,charset);
 						//replicate false behavior
 						if(!improvedMode && charset.name().equals("UTF-8")){
 							source = utilities.replicateFalseUmlauts(source);
 						}
 							
-						String[] lines = source.split("\n");
+						//delimeter \r, delete \n
+						source = source.replaceAll("\n", " ");
+						String[] lines = source.split("\r");
 
 						//check if string is empty
 						Pattern pattern = Pattern.compile("[a-z0-9äöüß]+",Pattern.CASE_INSENSITIVE);
