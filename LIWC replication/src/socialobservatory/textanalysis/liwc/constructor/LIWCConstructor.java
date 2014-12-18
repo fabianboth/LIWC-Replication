@@ -37,6 +37,7 @@ public class LIWCConstructor {
     private String language = "en";
     private boolean umlautFlag = true;
     private boolean eachLineSeparate = false;
+    private boolean weightedAggregate = false;
     private boolean aggregate = true;
     private boolean message = true;
     private boolean improvedMode = false;
@@ -57,7 +58,7 @@ public class LIWCConstructor {
     //args[3] contains replication mode (optional)
     //args[4] contains line mode (optional)
     //args[5] contains umlaut mode (optional)
-    //args[6] define if results in Linemode should be aggregated or not
+    //args[6] define if results in Linemode should be aggregated or not (weighted option possible)
 	//args[7] control popup message
 	public static void main(String[] args) {
 		File log = new File("./logfile.txt");
@@ -114,6 +115,8 @@ public class LIWCConstructor {
 		//define line mode
 		if(args.length > 4 && args[4].equalsIgnoreCase("on")){
 			eachLineSeparate = true;
+		}else{
+			eachLineSeparate = false;
 		}
 		
 		//define umlaut mode
@@ -127,8 +130,13 @@ public class LIWCConstructor {
 		//define if results in Linemode should be aggregated or not
 		if(args.length > 6 && args[6].equalsIgnoreCase("off")){
 			aggregate = false;
+			weightedAggregate = false;
+		}else if(args.length > 6 && args[6].equalsIgnoreCase("wc")){
+			aggregate = true;
+			weightedAggregate = true;
 		}else{
 			aggregate = true;
+			weightedAggregate = false;
 		}
 		//control popup message
 		if(args.length > 7 && args[7].equalsIgnoreCase("off")){
@@ -347,25 +355,37 @@ public class LIWCConstructor {
 
 			f.delete();
 			PrintWriter out = new PrintWriter(new FileWriter(f,true));
-			out.println(resultLines[0]);
+			out.print(resultLines[0] + "\n");
 			
 			//aggregate for all IDs
 			for(int s = 0; s < IDs.size(); s++){
 				double[] cats = new double[firstLine.length-1];
-				int count = 0;
+				int totalCount = 0;
+				double wordCount = 0;
 				for(String[] sa : allLines){
 					if(sa[0].equals(IDs.get(s))){
-						count++;
-						//first entry is entity identifier
-						for(int k = 0; k < cats.length; k++){
-							cats[k] = cats[k] + Double.parseDouble(sa[k+1]);
+						if(weightedAggregate == false){
+							totalCount++;
+							//first entry is entity identifier
+							for(int k = 0; k < cats.length; k++){
+								cats[k] = cats[k] + Double.parseDouble(sa[k+1]);
+							}
+						}else{
+							wordCount = Double.parseDouble(sa[1]);	//word count entry
+							totalCount += wordCount;
+							cats[0] = cats[0] + wordCount;
+							
+							//first entry is entity identifier
+							for(int k = 1; k < cats.length; k++){
+								cats[k] = cats[k] + Double.parseDouble(sa[k+1])*wordCount;
+							}
 						}
 					}
 				}
-				
-				//average (not word count)
+
+				//even or word count weighted average depends on options above
 				for(int r = 1; r < cats.length; r++){
-					cats[r] = Math.round(100*cats[r]/count)/100d;
+					cats[r] = Math.round(100*cats[r]/totalCount)/100d;
 				}
 
 				//write to file
