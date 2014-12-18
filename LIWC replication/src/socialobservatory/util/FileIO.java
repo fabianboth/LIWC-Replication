@@ -21,7 +21,7 @@ public class FileIO {
 	//parses text in file to string
     public static String readFile(File f) throws FileNotFoundException, IOException {
         String line = null;
-    	InputStreamReader isr = new InputStreamReader(new FileInputStream(f),"windows-1252");
+    	InputStreamReader isr = new InputStreamReader(new FileInputStream(f),"UTF-8");
     	BufferedReader in = new BufferedReader(isr);
     	
         StringBuffer sb = new StringBuffer();
@@ -37,7 +37,7 @@ public class FileIO {
         Path path = Paths.get(f.getAbsolutePath());
         byte[] data = Files.readAllBytes(path);
 		
-		String str = new String(data, "windows-1252");
+		String str = new String(data, "UTF-8");
         
         return str;
     }
